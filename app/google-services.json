@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "599508354709",
+    "project_id": "medication-7c584",
+    "storage_bucket": "medication-7c584.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599508354709:android:72b9f03a0717662701bd9c",
+        "android_client_info": {
+          "package_name": "com.teammeditalk.medicationproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599508354709-vnddo0jmoef0gq16dvgo0c7ioqggcj3v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.teammeditalk.medicationproject",
+            "certificate_hash": "a3d2d02b45ef76731101ab678e2fcde6d48ba845"
+          }
+        },
+        {
+          "client_id": "599508354709-nhlne8lani9lktu77f4k3ipv205ikhke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjxgbe8SXwBlHkEZY9HehDCn5YxtxajY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599508354709-nhlne8lani9lktu77f4k3ipv205ikhke.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
