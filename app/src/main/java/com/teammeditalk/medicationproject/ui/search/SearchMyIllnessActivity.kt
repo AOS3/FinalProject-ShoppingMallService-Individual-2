@@ -40,8 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teammeditalk.medicationproject.ui.util.SearchScreen
 import com.teammeditalk.medicationproject.ui.home.HomeActivity
+import com.teammeditalk.medicationproject.ui.home.HomeScreen
 import com.teammeditalk.medicationproject.ui.mypage.MyPageActivity
 import com.teammeditalk.medicationproject.ui.theme.MedicationProjectTheme
 
@@ -50,11 +53,10 @@ class SearchMyIllnessActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         setContent {
             MedicationProjectTheme {
                 Scaffold(
-topBar =   {
+topBar = {
     CenterAlignedTopAppBar(
         navigationIcon = {
             IconButton(onClick = {
@@ -74,18 +76,17 @@ topBar =   {
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = Color.Black
         ),
-        title = { Text(
-            textAlign = TextAlign.Center,
-            text = "약안심") },
+        title = {
+            Text(
+                textAlign = TextAlign.Center,
+                text = "약안심"
+            )
+        },
 
         )
 }
                 ) {innerPadding->
-                    SearchMyIllnessScreen(
-                        onSearchClick = {},
-                        onQueryChanded = {},
-                        searchResults = listOf("빈혈","아토피피부염"),
-                        modifier = Modifier.padding(innerPadding))
+             SearchMyIllnessScreen(modifier = Modifier.padding(innerPadding))
 
                 }
             }
@@ -96,66 +97,26 @@ topBar =   {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchMyIllnessScreen(
-    modifier: Modifier,
-    searchResults: List<String>,
-    onSearchClick : (String) -> Unit,
-    onQueryChanded : (String) -> Unit,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        // 1. 검색바
-        SearchBar(
-            query = "빈혈",
-            onQueryChange = onQueryChanded,
-            onSearch = onSearchClick,
-            active = true,
-            onActiveChange = {},
-            content ={
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(32.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(
-                        count = searchResults.size,
-                        key = { index -> searchResults[index] },
-                        itemContent = { index ->
-                            val result = searchResults[index]
-                            IllnessResultItem(result)
-                        }
-                    )
-                }
-            }
+fun SearchMyIllnessScreen(modifier: Modifier){
+    Column {
+        SearchScreen(
+            onSearchClick = {},
+            onQueryChanged = {},
+            searchResults = listOf("빈혈", "아토피피부염"),
+            modifier = modifier.fillMaxWidth()
         )
-        Button(
-            onClick = {},
-            modifier = modifier
-                .padding(10.dp)
-                .fillMaxWidth()) {
-            Text(
-                text = "내 질병으로 추가"
-            )
-
-        }
     }
 }
 
 
+@Preview(showBackground = true)
 @Composable
-fun IllnessResultItem(
-    item : String,
-){
-    Column{
-        Text(
-            text = item
+fun GreetingPreview() {
+    MedicationProjectTheme {
+        SearchMyIllnessScreen(
+            modifier = Modifier
         )
+
     }
 }

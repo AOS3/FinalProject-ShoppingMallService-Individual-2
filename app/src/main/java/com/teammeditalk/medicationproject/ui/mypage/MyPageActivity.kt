@@ -71,6 +71,7 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.lifecycle.lifecycleScope
 import com.teammeditalk.medicationproject.R
+import com.teammeditalk.medicationproject.ui.drug.EditDrugActivity
 import com.teammeditalk.medicationproject.ui.edit.EditAllergyActivity
 import com.teammeditalk.medicationproject.ui.home.HomeActivity
 import com.teammeditalk.medicationproject.ui.search.SearchMyIllnessActivity
@@ -206,7 +207,7 @@ fun MyPageScreen(
             healthInfoSection(modifier,sleepDuration,stepCount)
             allergySection(context)
             diseaseSection(context)
-            medicineSection()
+            medicineSection(context)
         }
 
 
@@ -289,7 +290,7 @@ private fun LazyListScope.diseaseSection(context : Context) {
     }
 }
 
-private fun LazyListScope.medicineSection() {
+private fun LazyListScope.medicineSection(context : Context) {
     item {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -303,6 +304,8 @@ private fun LazyListScope.medicineSection() {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
             TextButton(onClick = {
+                val intent = Intent(context,EditDrugActivity::class.java)
+                context.startActivity(intent)
 
             }) {
                 Text(

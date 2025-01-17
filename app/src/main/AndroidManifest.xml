@@ -58,6 +58,7 @@
         </activity>
         <activity android:name=".ui.edit.EditAllergyActivity"/>
         <activity android:name=".ui.search.SearchMyIllnessActivity"/>
+        <activity android:name=".ui.drug.EditDrugActivity"/>
     </application>
 
 </manifest>
