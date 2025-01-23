@@ -1,6 +1,10 @@
 [versions]
 agp = "8.7.1"
+annotation = "0.8.15"
+annotationVersion = "0.8.13"
 connectClient = "1.1.0-alpha10"
+core = "0.8.13"
+datastoreCore = "1.1.2"
 firebaseBom = "33.7.0"
 firebaseUiAuth = "7.2.0"
 fragmentKtx = "1.8.5"
@@ -9,19 +13,46 @@ coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+ktorClientAndroid = "3.0.3"
+ktorClientCio = "3.0.3"
+ktorClientContentNegotiation = "3.0.3"
+ktorClientCore = "3.0.3"
+ktorClientJson = "3.0.3"
+ktorClientLogging = "3.0.3"
+ktorClientSerialization = "3.0.3"
+ktorSerializationKotlinxJson = "3.0.3"
+ktorSerializationKotlinxXml = "3.0.3"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 material = "1.7.6"
 navigationCompose = "2.8.5"
 appcompat = "1.7.0"
+processor = "0.8.13"
+protobufKotlin = "3.19.4"
+retrofit = "2.11.0"
+kotlin_ksp = "2.0.0-1.0.23"
+
+# Protobuf, GRPC
+# [GitHub](https://github.com/protocolbuffers/protobuf)
+protobuf = "4.27.2"
+# [GitHub](https://github.com/google/protobuf-gradle-plugin)
+protobuf_plugin = "0.9.4"
+# [Github](https://github.com/googleapis/sdk-platform-java/tree/main/java-common-protos)
+protobuf_google_common = "2.39.1"
 
 [libraries]
 androidx-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCore" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+annotation = { module = "com.tickaroo.tikxml:annotation", version.ref = "annotation" }
+annotation-v0813 = { module = "com.tickaroo.tikxml:annotation", version.ref = "annotationVersion" }
+core = { module = "com.tickaroo.tikxml:core", version.ref = "annotation" }
+core-v0813 = { module = "com.tickaroo.tikxml:core", version.ref = "core" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
@@ -39,9 +70,25 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCio" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktorClientJson" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktorClientSerialization" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
+ktor-serialization-kotlinx-xml = { module = "io.ktor:ktor-serialization-kotlinx-xml", version.ref = "ktorSerializationKotlinxXml" }
+processor = { module = "com.tickaroo.tikxml:processor", version.ref = "annotation" }
+processor-v0813 = { module = "com.tickaroo.tikxml:processor", version.ref = "processor" }
+protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "protobufKotlin" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin_ksp" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf_plugin" }
 
