@@ -20,6 +20,7 @@
 
 
     <application
+        android:name=".ui.Application"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -47,9 +48,6 @@
         <activity android:name=".ui.home.HomeActivity"/>
         <activity android:name=".ui.mypage.MyPageActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
-            </intent-filter>
 
             <!-- Permission handling for Android 14 and later -->
             <intent-filter>
@@ -58,9 +56,14 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".ui.edit.EditAllergyActivity"/>
-        <activity android:name=".ui.search.SearchMyIllnessActivity"/>
+        <activity android:name=".ui.allergy.SetAllergyActivity"/>
+        <activity android:name=".ui.disease.SearchMyDiseaseActivity"/>
         <activity android:name=".ui.drug.EditDrugActivity"/>
+        <activity android:name=".ui.search.SearchActivity"
+            android:exported="true">
+
+
+        </activity>
     </application>
 
 </manifest>

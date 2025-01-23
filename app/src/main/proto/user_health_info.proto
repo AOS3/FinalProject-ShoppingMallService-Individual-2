@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "com.teammeditalk.medicationproject";
+option java_multiple_files = true;
+
+// 약국 위치 정보를 위한 별도 메시지 타입
+message PharmacyLocation {
+  string address = 1;     // 주소
+  string name = 2;        // 약국 이름
+}
+
+message UserHealthInfo {
+
+  repeated string diseaseInfo = 1;
+  repeated string drugInfo = 2;
+  repeated string allergyInfo = 3;
+
+  // 추가되는 정보
+  int32 age = 4;                    // 나이
+  double weight= 5;              // 몸무게
+  PharmacyLocation pharmacyLocation = 6;
+}

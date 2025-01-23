@@ -6,6 +6,7 @@ plugins {
     id("com.google.gms.google-services")
     alias(libs.plugins.kotlin.kapt)
     id("kotlinx-serialization")
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -45,13 +46,21 @@ android {
 
 dependencies {
 
-    implementation("io.ktor:ktor-serialization-kotlinx-xml:3.0.3")
-    implementation("io.ktor:ktor-client-core:3.0.3")
-    implementation("io.ktor:ktor-client-android:3.0.3")
+    implementation("androidx.fragment:fragment-ktx:1.8.3")
 
-    kapt("com.tickaroo.tikxml:processor:0.8.13")
-    implementation("com.tickaroo.tikxml:annotation:0.8.13")
-    implementation("com.tickaroo.tikxml:core:0.8.13")
+    implementation("androidx.datastore:datastore:1.1.2")
+
+    implementation(libs.protobuf.kotlin)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.xml)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+
+    kapt(libs.processor.v0813)
+    implementation(libs.annotation.v0813)
+    implementation(libs.core.v0813)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.serialization)
@@ -65,7 +74,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.firebase.ui.auth)
 
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -83,4 +92,28 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+kapt {
+    correctErrorTypes = true
+}
+
+protobuf {
+    val protobufVersion =
+        libs.versions.protobuf
+            .asProvider()
+            .get()
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protobufVersion"
+    }
+
+    generateProtoTasks {
+        all().forEach {
+            it.plugins {
+                register("java") { option("lite") }
+                register("kotlin") { option("lite") }
+            }
+        }
+    }
 }
