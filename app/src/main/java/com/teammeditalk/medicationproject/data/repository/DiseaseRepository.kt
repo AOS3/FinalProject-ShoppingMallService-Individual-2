@@ -1,4 +1,4 @@
-package com.teammeditalk.medicationproject.data.repository.impl
+package com.teammeditalk.medicationproject.data.repository
 
 import com.teammeditalk.medicationproject.data.network.ApiClient
 

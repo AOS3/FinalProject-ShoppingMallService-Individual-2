@@ -46,6 +46,9 @@ android {
 
 dependencies {
 
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+
     implementation("androidx.fragment:fragment-ktx:1.8.3")
 
     implementation("androidx.datastore:datastore:1.1.2")
@@ -55,6 +58,7 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.xml)
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.android)
 

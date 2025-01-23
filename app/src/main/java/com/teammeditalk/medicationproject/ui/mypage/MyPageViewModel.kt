@@ -3,8 +3,8 @@ package com.teammeditalk.medicationproject.ui.mypage
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.UserHealthInfoRepository
-import com.teammeditalk.medicationproject.data.repository.impl.DiseaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -13,12 +13,27 @@ class MyPageViewModel(
     private val userHealthInfoRepository: UserHealthInfoRepository,
     private val diseaseRepository: DiseaseRepository,
 ) : ViewModel() {
-    val userHealthInfoFlow = userHealthInfoRepository.healthInfoFlow
+    val diseaseFLow = userHealthInfoRepository.diseaseFlow
     val allergyFlow = userHealthInfoRepository.allergyFlow
 
-    private val _allergyState = MutableStateFlow(emptyList<String>())
+    init {
+        viewModelScope.launch {
+            userHealthInfoRepository.allergyFlow.collect {
+                _allergyState.value = it
+            }
+            userHealthInfoRepository.diseaseFlow.collect {
+                _diseaseState.value = it
+            }
+        }
+    }
 
+    private val _diseaseState = MutableStateFlow(emptyList<String>())
+    val diseaseState = _diseaseState.asStateFlow()
+
+    private val _allergyState = MutableStateFlow(emptyList<String>())
     val allergyState = _allergyState.asStateFlow()
+
+
     private val _searchQuery =
         MutableStateFlow("").apply {
             Log.d("쿼리", this.value)
@@ -42,27 +57,25 @@ class MyPageViewModel(
     }
 
     fun searchDiseaseName(searchText: String) {
-        Log.d("searchText", searchText)
         viewModelScope.launch {
             val result =
                 diseaseRepository
                     .searchDiseaseName(searchText)
-            Log.d("_결과", result.toString())
             _searchResult.value = result
-        }
-    }
-
-    init {
-        viewModelScope.launch {
-            userHealthInfoRepository.allergyFlow.collect {
-                _allergyState.value = it
-            }
         }
     }
 
     fun setAllergyInfo(allergyList: List<String>) {
         viewModelScope.launch {
             userHealthInfoRepository.saveAllergyInfo(allergyList.toSet())
+            _allergyState.value = allergyList
+        }
+    }
+
+    fun saveDiseaseInfo(diseaseList: List<String>) {
+        viewModelScope.launch {
+            userHealthInfoRepository.saveDiseaseInfo(diseaseList)
+            _diseaseState.value = diseaseList
         }
     }
 }

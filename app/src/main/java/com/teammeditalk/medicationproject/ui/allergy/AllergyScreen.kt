@@ -1,6 +1,5 @@
 package com.teammeditalk.medicationproject.ui.allergy
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,15 +27,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.teammeditalk.medicationproject.ui.mypage.MyPageViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun AllergyScreen(
+    navController: NavController,
     savedList: List<String>,
     viewModel: MyPageViewModel,
     modifier: Modifier = Modifier,
-    onSave: (List<String>) -> Unit,
 ) {
     var selectedAllergies by remember { mutableStateOf(savedList.toSet()) }
 
@@ -138,6 +138,7 @@ fun AllergyScreen(
         Button(
             onClick = {
                 viewModel.setAllergyInfo(allergyList = selectedAllergies.toList())
+                navController.popBackStack()
             },
         ) {
             Text(

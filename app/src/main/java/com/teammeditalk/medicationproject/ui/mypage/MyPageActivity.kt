@@ -1,6 +1,5 @@
 package com.teammeditalk.medicationproject.ui.mypage
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -32,16 +31,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.dataStore
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -53,21 +51,19 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.UserHealthInfoRepository
-import com.teammeditalk.medicationproject.data.repository.impl.DiseaseRepository
 import com.teammeditalk.medicationproject.ui.Application
 import com.teammeditalk.medicationproject.ui.allergy.AllergyScreen
 import com.teammeditalk.medicationproject.ui.component.TopAppBar
 import com.teammeditalk.medicationproject.ui.drug.SetDrugScreen
 import com.teammeditalk.medicationproject.ui.home.HomeActivity
-import com.teammeditalk.medicationproject.ui.search.SearchScreen
+import com.teammeditalk.medicationproject.ui.search.disease.SearchMyDiseaseScreen
 import com.teammeditalk.medicationproject.ui.theme.MedicationProjectTheme
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
@@ -82,12 +78,11 @@ enum class MyPageScreen {
 
 class MyPageActivity : ComponentActivity() {
     private var allergyList by mutableStateOf<List<String>>(emptyList())
+    private var diseaseList by mutableStateOf<List<String>>(emptyList())
 
     // 지병 리스트
-    var diseaseList = mutableStateListOf<String>()
-    var selectedDisease by mutableStateOf<String?>(null)
-    var sleepDuration by mutableStateOf("--")
-    var stepCount by mutableStateOf(0)
+    private var sleepDuration by mutableStateOf("--")
+    private var stepCount by mutableStateOf(0)
 
     private val dataStore by lazy {
         (application as Application).userHealthdataStore
@@ -138,28 +133,31 @@ class MyPageActivity : ComponentActivity() {
                 this,
                 MyPageViewModelFactory(DiseaseRepository(), UserHealthInfoRepository(dataStore = dataStore)),
             )[MyPageViewModel::class.java]
-
-        selectedDisease = intent.getStringExtra("selected_disease")
-        selectedDisease?.let { diseaseList.add(it) }
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-
             val savedAllergies by viewmodel.allergyState.collectAsState()
+            val savedDisease by viewmodel.diseaseState.collectAsState()
+            Log.d("savedDisease ", "$savedDisease")
 
             LaunchedEffect(Unit) {
                 viewmodel.allergyFlow.collectLatest {
                     allergyList = it.toMutableList()
+                }
+                viewmodel.diseaseFLow.collectLatest {
+                    diseaseList = it.toMutableList()
                 }
             }
 
             MedicationProjectTheme {
                 Scaffold(
                     topBar = {
-                        TopAppBar(navController)
+                        TopAppBar(
+                            "내 정보",
+                            context = LocalContext.current,
+                        )
                     },
                 ) { innerPadding ->
-
                     NavHost(
                         navController = navController,
                         startDestination = MyPageScreen.Start.name,
@@ -172,7 +170,6 @@ class MyPageActivity : ComponentActivity() {
                             MyPageScreen(
                                 navController = navController,
                                 allergyList = allergyList,
-                                context = this@MyPageActivity,
                                 modifier = Modifier.padding(innerPadding),
                                 onBackButtonClick = {
                                     val intent = Intent(this@MyPageActivity, HomeActivity::class.java)
@@ -180,19 +177,20 @@ class MyPageActivity : ComponentActivity() {
                                 },
                                 sleepDuration = sleepDuration,
                                 stepCount = stepCount,
-                                diseaseList = diseaseList,
+                                diseaseList = savedDisease,
                             )
                         }
                         composable(route = MyPageScreen.Allergy.name) {
                             AllergyScreen(
+                                navController = navController,
                                 savedList = savedAllergies,
                                 modifier = Modifier,
                                 viewModel = viewmodel,
-                                onSave = {},
                             )
                         }
                         composable(route = MyPageScreen.Disease.name) {
-                            SearchScreen(
+                            SearchMyDiseaseScreen(
+                                navController = navController,
                                 viewmodel = viewmodel,
                                 context = this@MyPageActivity,
                                 modifier = Modifier.padding(innerPadding),
@@ -217,24 +215,20 @@ class MyPageActivity : ComponentActivity() {
 fun MyPageScreen(
     navController: NavController,
     allergyList: List<String>,
-    diseaseList: MutableList<String>,
-    context: Context,
+    diseaseList: List<String>,
     modifier: Modifier = Modifier,
     onBackButtonClick: () -> Unit,
     sleepDuration: String,
     stepCount: Int,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
+    Column {
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(16.dp),
         ) {
             healthInfoSection(modifier, sleepDuration, stepCount)
             allergySection(navController = navController, allergyList = allergyList)
-            diseaseSection(navController = navController, diseaseList = diseaseList.toList())
+            diseaseSection(navController = navController, diseaseList = diseaseList)
             medicineSection(navController)
         }
     }

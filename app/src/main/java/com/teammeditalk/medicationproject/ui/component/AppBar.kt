@@ -1,5 +1,7 @@
 package com.teammeditalk.medicationproject.ui.component
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -17,12 +19,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import com.teammeditalk.medicationproject.ui.home.HomeActivity
 
 @Suppress("ktlint:standard:function-naming")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(navController: NavController) {
+fun TopAppBar(
+    title: String,
+    context: Context,
+) {
     CenterAlignedTopAppBar(
         modifier = Modifier.fillMaxWidth(),
         colors =
@@ -33,7 +38,7 @@ fun TopAppBar(navController: NavController) {
         title = {
             Text(
                 textAlign = TextAlign.Center,
-                text = "내 정보",
+                text = title,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
@@ -41,7 +46,8 @@ fun TopAppBar(navController: NavController) {
         },
         navigationIcon = {
             IconButton(onClick = {
-                navController.popBackStack()
+                val intent = Intent(context, HomeActivity::class.java)
+                context.startActivity(intent)
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
