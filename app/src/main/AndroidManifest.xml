@@ -4,6 +4,8 @@
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.health.READ_HEART_RATE"/>
     <uses-permission android:name="android.permission.health.WRITE_HEART_RATE"/>
     <uses-permission android:name="android.permission.health.READ_STEPS"/>
@@ -31,6 +33,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MedicationProject"
         tools:targetApi="31">
+
+        <meta-data android:name="com.kakao.vectormap.KAKAO_APP_KEY"
+            android:value="KAKAO_MAP_KEY"/>
+
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
@@ -57,14 +63,7 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".ui.allergy.SetAllergyActivity"/>
-        <activity android:name=".ui.disease.SearchMyDiseaseActivity"/>
-        <activity android:name=".ui.drug.EditDrugActivity"/>
-        <activity android:name=".ui.search.SearchActivity"
-            android:exported="true">
 
-
-        </activity>
     </application>
 
 </manifest>

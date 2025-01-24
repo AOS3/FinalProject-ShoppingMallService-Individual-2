@@ -6,9 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,15 +14,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -35,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -65,12 +61,14 @@ import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugScreen
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugViewModel
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugViewModelFactory
 import com.teammeditalk.medicationproject.ui.theme.MedicationProjectTheme
+import com.teammeditalk.medicationproject.ui.util.RoundedButton
 
 enum class HomeScreen {
     Home,
     Search,
     Detail,
     Cart,
+    Map,
 }
 
 class HomeActivity : ComponentActivity() {
@@ -94,7 +92,6 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             val navController = rememberNavController()
-
             MedicationProjectTheme {
                 Scaffold(
                     topBar = {
@@ -126,7 +123,9 @@ class HomeActivity : ComponentActivity() {
                             HomeScreen(
                                 navController = navController,
                                 modifier = Modifier.padding(innerPadding),
-                                onSymptomItemClick = {},
+                                onSymptomItemClick = {
+                                    navController.navigate(HomeScreen.Search.name)
+                                },
                                 onPartItemClick = {},
                             )
                         }
@@ -145,6 +144,9 @@ class HomeActivity : ComponentActivity() {
                         }
                         composable(route = HomeScreen.Cart.name) {
                         }
+
+                        composable(route = HomeScreen.Map.name) {
+                        }
                     }
                 }
             }
@@ -160,34 +162,45 @@ class HomeActivity : ComponentActivity() {
         onPartItemClick: () -> Unit,
     ) {
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier =
                 modifier
                     .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            SearchBar(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                onClick = {
-                    navController.navigate(HomeScreen.Search.name)
-                },
-            )
-            // 증상별 검색
-            CategorySection(
-                title = "증상별로 검색",
-                items = listOf("두통", "감기", "소화불량", "피로"),
-                onItemClick = onSymptomItemClick,
-            )
+            Row {
+                RoundedButton(
+                    text = "증상별로\n약 검색하기",
+                    imageVector = Icons.Default.Search,
+                    onClick = {
+                        // todo : 증상 카테고리도 넘기기
+                        navController.navigate(HomeScreen.Search.name)
+                    },
+                )
 
-            // 약 이름을 검색
-            CategorySection(
-                title = "약 이름으로 검색",
-                items = listOf("머리", "목", "가슴", "배"),
-                onItemClick = onPartItemClick,
-            )
+                RoundedButton(
+                    text = "약 이름으로\n검색하기",
+                    imageVector = Icons.Default.Search,
+                    onClick = {
+                        // todo : 약 이름 카테고리도 넘기기
+                        navController.navigate(HomeScreen.Search.name)
+                    },
+                )
+            }
+
+            Row {
+                RoundedButton(
+                    text = "방문 가능한\n약국 찾기",
+                    imageVector = Icons.Default.LocationOn,
+                    onClick = {},
+                )
+
+                RoundedButton(
+                    text = "나에게 맞는 \n영양제 찾기",
+                    imageVector = Icons.Default.Face,
+                    onClick = {},
+                )
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             // 하단 네비게이션
@@ -225,40 +238,6 @@ class HomeActivity : ComponentActivity() {
 
     @Suppress("ktlint:standard:function-naming")
     @Composable
-    private fun SearchBar(
-        modifier: Modifier = Modifier,
-        onClick: () -> Unit,
-    ) {
-        Surface(
-            modifier =
-                modifier
-                    .height(48.dp)
-                    .clickable(onClick = onClick),
-            shape = RoundedCornerShape(8.dp),
-            color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "검색",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "내 증상으로 검색",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                )
-            }
-        }
-    }
-
-    @Suppress("ktlint:standard:function-naming")
-    @Composable
     private fun CategorySection(
         title: String,
         items: List<String>,
@@ -279,7 +258,7 @@ class HomeActivity : ComponentActivity() {
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                 )
-                TextButton(onClick = { /* 전체보기 */ }) {
+                TextButton(onClick = { onItemClick() }) {
                     Text("전체보기")
                 }
             }

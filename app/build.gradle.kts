@@ -1,3 +1,7 @@
+import com.android.manifmerger.Actions.load
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -10,6 +14,15 @@ plugins {
 }
 
 android {
+// 추가
+    val properties =
+        Properties().apply {
+            load(FileInputStream(rootProject.file("local.properties")))
+        }
+
+    buildFeatures {
+        buildConfig = true
+    }
     namespace = "com.teammeditalk.medicationproject"
     compileSdk = 35
 
@@ -21,9 +34,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "KAKAO_MAP_KEY", properties.getProperty("KAKAO_MAP_KEY"))
     }
 
     buildTypes {
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -41,10 +56,13 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
+
+    implementation("com.kakao.maps.open:android:2.12.8")
 
     implementation("io.coil-kt.coil3:coil-compose:3.0.4")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
