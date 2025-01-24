@@ -137,7 +137,7 @@ fun AllergyScreen(
 
         Button(
             onClick = {
-                viewModel.setAllergyInfo(allergyList = selectedAllergies.toList())
+                viewModel.saveAllergyInfo(allergyList = selectedAllergies.toList())
                 navController.popBackStack()
             },
         ) {

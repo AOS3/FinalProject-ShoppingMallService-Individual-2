@@ -10,15 +10,7 @@ class UserHealthInfoRepository(
     private val dataStore: DataStore<UserHealthInfo>,
 ) {
     val healthInfoFlow: Flow<UserHealthInfo> = dataStore.data
-    val allergyFlow: Flow<List<String>> =
-        dataStore.data.map {
-            it.allergyInfoList
-        }
 
-    val diseaseFlow =
-        dataStore.data.map {
-            it.diseaseInfoList
-        }
     val drugFlow =
         dataStore.data.map {
             it.drugInfoList
@@ -28,36 +20,6 @@ class UserHealthInfoRepository(
         dataStore.data.map {
             it.pharmacyLocation
         }
-
-    suspend fun saveAllergyInfo(allergyList: Set<String>) {
-        dataStore.updateData {
-            it
-                .toBuilder()
-                .clearAllergyInfo()
-                .addAllAllergyInfo(allergyList)
-                .build()
-        }
-    }
-
-    suspend fun updateAllergyInfo(allergyList: Set<String>) {
-        dataStore.updateData {
-            it
-                .toBuilder()
-                .clearAllergyInfo()
-                .addAllAllergyInfo(allergyList)
-                .build()
-        }
-    }
-
-    suspend fun saveDiseaseInfo(diseaseList: List<String>) {
-        dataStore.updateData {
-            it
-                .toBuilder()
-                .clearDiseaseInfo()
-                .addAllDiseaseInfo(diseaseList)
-                .build()
-        }
-    }
 
     suspend fun saveDrugInfo(drugList: List<String>) {
         dataStore.updateData {

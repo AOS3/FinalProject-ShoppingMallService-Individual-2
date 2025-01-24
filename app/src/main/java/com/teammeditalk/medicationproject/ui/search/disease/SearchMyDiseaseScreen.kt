@@ -1,6 +1,5 @@
 package com.teammeditalk.medicationproject.ui.search.disease
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,8 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -40,16 +40,13 @@ import com.teammeditalk.medicationproject.ui.util.SearchResultItem
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchMyDiseaseScreen(
+    savedDiseaseList: List<String>,
     navController: NavController,
-    context: Context,
     modifier: Modifier,
     viewmodel: MyPageViewModel,
 ) {
-    val diseases by viewmodel.diseaseState.collectAsState()
+    var selectedDisease by remember { mutableStateOf(savedDiseaseList) }
 
-    val selectedDiseaseList = remember { mutableStateListOf<String>().apply { 
-        addAll(diseases)
-    } }
     val searchQuery by viewmodel.searchQuery.collectAsState()
     val searchResults by viewmodel.searchResult.collectAsState()
 
@@ -62,8 +59,7 @@ fun SearchMyDiseaseScreen(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         // 1. 검색바
-        Column(
-        ) {
+        Column {
             SearchBar(
                 modifier = Modifier.height(500.dp),
                 // 검색 영역이 남은 공간을 채우도록
@@ -101,8 +97,8 @@ fun SearchMyDiseaseScreen(
                             SearchResultItem(
                                 result,
                                 onClick = {
-                                    if (!selectedDiseaseList.contains(result)) {
-                                        selectedDiseaseList.add(result)
+                                    if (!savedDiseaseList.contains(result)) {
+                                        selectedDisease = selectedDisease + result
                                         viewmodel.reset()
                                     }
                                 },
@@ -129,19 +125,19 @@ fun SearchMyDiseaseScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    selectedDiseaseList.forEach {
+                    selectedDisease.forEach {
                         DiseaseItem(
-                            onDelete = {
-                                selectedDiseaseList.remove(it)
-                            },
                             diseaseName = it,
+                            onDelete = {
+                                selectedDisease = selectedDisease - it
+                            },
                         )
                     }
                 }
             }
             Button(
                 onClick = {
-                    viewmodel.saveDiseaseInfo(diseaseList = selectedDiseaseList)
+                    viewmodel.saveDiseaseInfo(diseaseList = selectedDisease)
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
