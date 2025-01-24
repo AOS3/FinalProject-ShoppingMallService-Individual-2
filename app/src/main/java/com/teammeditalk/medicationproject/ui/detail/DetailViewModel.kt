@@ -1,6 +1,8 @@
 package com.teammeditalk.medicationproject.ui.detail
 
 import androidx.lifecycle.ViewModel
+import com.teammeditalk.medicationproject.data.repository.DrugRepository
 
-class DetailViewModel : ViewModel() {
-}
+class DetailViewModel(
+    private val drugRepository: DrugRepository,
+) : ViewModel()

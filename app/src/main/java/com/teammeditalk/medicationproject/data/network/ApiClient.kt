@@ -1,12 +1,14 @@
 package com.teammeditalk.medicationproject.data.network
 
 import android.util.Log
+import com.teammeditalk.medicationproject.data.model.DrugResponse
+import com.teammeditalk.medicationproject.data.model.Item
 import com.teammeditalk.medicationproject.data.model.search.SearchDiseaseResponse
 import com.tickaroo.tikxml.TikXml
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.accept
@@ -15,6 +17,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.JsonConvertException
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.serialization.kotlinx.xml.xml
 import kotlinx.serialization.SerializationException
 import nl.adaptivity.xmlutil.XmlDeclMode
@@ -36,13 +39,68 @@ object ApiClient {
                         },
                 )
             }
+            install(ContentNegotiation) {
+                json()
+            }
             install(Logging) {
                 level = LogLevel.ALL
             }
-            defaultRequest {
-                contentType(ContentType.Application.Xml)
-                accept(ContentType.Application.Xml)
-            }
+        }
+
+    suspend fun getDrbEasyDrugList(
+        itemName: String, // 제품명
+    ): List<String> =
+        try {
+            val response: List<String> =
+                client
+                    .get("http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList") {
+                        contentType((ContentType.Application.Json))
+                        accept(ContentType.Application.Json)
+                        url {
+                            parameters.append(
+                                "serviceKey",
+                                "D5Pn1X94hE69T8eSXEWBopXajX0xhBgzDbAEkf5CCiJL4jp2I598D4ZCP9gNsnM8tRGYfL6hKiFC5KYccYVuSA==",
+                            )
+                            parameters.append("itemName", itemName)
+                            parameters.append("type", "json")
+                        }
+                    }.body<DrugResponse>()
+                    .body.items
+                    .map {
+                        it.itemName.toString()
+                    }
+            response
+        } catch (e: SerializationException) {
+            e.printStackTrace()
+            Log.e("직렬화 실패", e.message.toString())
+            emptyList()
+        } catch (e: JsonConvertException) {
+            e.printStackTrace()
+            Log.e("직렬화 실패 by Json", e.message.toString())
+            emptyList()
+        }
+
+    suspend fun getDrugDetailInfo(itemName: String): List<Item> =
+        try {
+            val response =
+                client
+                    .get("http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList") {
+                        contentType((ContentType.Application.Json))
+                        accept(ContentType.Application.Json)
+                        url {
+                            parameters.append(
+                                "serviceKey",
+                                "D5Pn1X94hE69T8eSXEWBopXajX0xhBgzDbAEkf5CCiJL4jp2I598D4ZCP9gNsnM8tRGYfL6hKiFC5KYccYVuSA==",
+                            )
+                            parameters.append("itemName", itemName)
+                            parameters.append("type", "json")
+                        }
+                    }.body<DrugResponse>()
+                    .body.items
+            response
+        } catch (e: Exception) {
+            Log.d("error", e.message.toString())
+            emptyList()
         }
 
     suspend fun searchDiseaseName(searchText: String): List<String> =

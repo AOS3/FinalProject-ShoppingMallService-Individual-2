@@ -1,4 +1,5 @@
 <resources>
+    <style name="drug_base_url">http://apis.data.go.kr/1471000/DrbEasyDrugInfoService</style>
     <string name="disease_base_url">https://apis.data.go.kr/B551182/diseaseInfoService1/</string>
     <string name="disease_api_key">D5Pn1X94hE69T8eSXEWBopXajX0xhBgzDbAEkf5CCiJL4jp2I598D4ZCP9gNsnM8tRGYfL6hKiFC5KYccYVuSA==</string>
     <string name="app_name">MedicationProject</string>
