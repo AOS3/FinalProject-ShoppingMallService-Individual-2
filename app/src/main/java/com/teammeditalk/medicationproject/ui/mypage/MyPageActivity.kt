@@ -114,6 +114,7 @@ class MyPageActivity : ComponentActivity() {
                     MyAllergyRepository(dataStore = dataStore),
                 ),
             )[MyPageViewModel::class.java]
+
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()

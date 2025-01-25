@@ -24,6 +24,7 @@ import nl.adaptivity.xmlutil.XmlDeclMode
 import nl.adaptivity.xmlutil.serialization.XML
 import okio.Buffer
 
+// ktor
 // todo api를 요청할 때마다 유사한 코드를 만들어야해서 번거로움  -> 개선하기
 object ApiClient {
     private val client: HttpClient =
