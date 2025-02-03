@@ -9,21 +9,25 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.teammeditalk.medicationproject.data.model.Item
-import com.teammeditalk.medicationproject.ui.component.TopAppBar
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun DrugDetailScreen(
+fun DrugDetailInfoScreen(
     modifier: Modifier,
     drugInfo: Item,
+    viewModel: DetailViewModel,
 ) {
+    val myKeyWord by viewModel.myKeyWord.collectAsState()
+    viewModel.setDrugInfo(drugInfo)
+    viewModel.findMyIllness()
     val scrollState = rememberScrollState()
     Column(
         modifier =
@@ -31,10 +35,6 @@ fun DrugDetailScreen(
                 .verticalScroll(scrollState)
                 .padding(5.dp),
     ) {
-        TopAppBar(
-            "약 상세 정보",
-            context = LocalContext.current,
-        )
         Text(
             modifier = modifier.padding(bottom = 10.dp),
             textAlign = TextAlign.Center,
@@ -44,6 +44,12 @@ fun DrugDetailScreen(
         AsyncImage(
             model = drugInfo.itemImage.toString(),
             contentDescription = null,
+        )
+
+        DrugInfoItem(
+            modifier = modifier,
+            title = "성현님과 관련된 키워드 : ",
+            info = if (myKeyWord.isEmpty()) "없음" else myKeyWord.toString(),
         )
 
         DrugInfoItem(
@@ -59,23 +65,32 @@ fun DrugDetailScreen(
         )
         DrugInfoItem(
             modifier = modifier,
-            title = "주의 사항 : ",
+            title = "사용 시 주의 사항 : ",
+            info = drugInfo.atpnQesitm.toString(),
+        )
+        DrugInfoItem(
+            modifier = modifier,
+            title = "약 복용 전 알아둬야할 사항 : ",
             info = drugInfo.atpnWarnQesitm.toString(),
         )
         DrugInfoItem(
             modifier = modifier,
-            title = "주의해야할 음식 또는 약 : ",
+            title = "주의해야 할 약 또는 음식 : ",
             info = drugInfo.intrcQesitm.toString(),
         )
-        DrugInfoItem(
-            modifier = modifier,
-            title = "이상 반응 : ",
-            info = drugInfo.seQesitm.toString(),
-        )
+
+//        DrugInfoItem(
+//            modifier = modifier,
+//            title = "이상 반응 : ",
+//            info = drugInfo.seQesitm.toString(),
+//        )
 
         Button(
             modifier = modifier.align(Alignment.CenterHorizontally),
-            onClick = {},
+            onClick = {
+                // todo : 장바구니에 약 담기
+                viewModel.saveDrugIntoCart()
+            },
         ) {
             Text(
                 text = "장바구니에 담기",

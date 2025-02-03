@@ -4,6 +4,14 @@ import com.teammeditalk.medicationproject.data.model.Item
 import com.teammeditalk.medicationproject.data.network.ApiClient
 
 class DrugRepository {
+    suspend fun getDrugBySymptom(symptom: String): List<Item> =
+        try {
+            ApiClient.getDrugBySymptom(symptom)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+
     suspend fun getDrugList(itemName: String): List<String> =
         try {
             ApiClient.getDrbEasyDrugList(itemName)

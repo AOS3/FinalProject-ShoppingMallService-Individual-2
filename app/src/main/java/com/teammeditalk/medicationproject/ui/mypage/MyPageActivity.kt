@@ -135,13 +135,13 @@ class MyPageActivity : ComponentActivity() {
                         startDestination = MyPageScreen.Start.name,
                         modifier =
                             Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
+                                .padding(innerPadding)
+                                .fillMaxSize(),
                     ) {
                         composable(route = MyPageScreen.Start.name) {
                             MyPageScreen(
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding),
+                                modifier = Modifier,
                                 sleepDuration = sleepDuration,
                                 stepCount = stepCount,
                                 allergyList = savedAllergies,
@@ -160,12 +160,12 @@ class MyPageActivity : ComponentActivity() {
                             SearchMyDiseaseScreen(
                                 navController = navController,
                                 viewmodel = viewmodel,
-                                modifier = Modifier.padding(innerPadding),
+                                modifier = Modifier,
                                 savedDiseaseList = savedDisease,
                             )
                         }
                         composable(route = MyPageScreen.Drug.name) {
-                            SetDrugScreen(modifier = Modifier.padding(innerPadding))
+                            SetDrugScreen(modifier = Modifier)
                         }
                     }
                 }

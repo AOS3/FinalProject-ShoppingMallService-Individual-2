@@ -82,6 +82,32 @@ object ApiClient {
             emptyList()
         }
 
+    suspend fun getDrugBySymptom(symptom: String): List<Item> =
+        try {
+            val response =
+                client
+                    .get("http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList") {
+                        contentType((ContentType.Application.Json))
+                        accept(ContentType.Application.Json)
+                        url {
+                            parameters.append(
+                                "serviceKey",
+                                "D5Pn1X94hE69T8eSXEWBopXajX0xhBgzDbAEkf5CCiJL4jp2I598D4ZCP9gNsnM8tRGYfL6hKiFC5KYccYVuSA==",
+                            )
+                            parameters.append("efcyQesitm", symptom)
+                            parameters.append("type", "json")
+                        }
+                    }.body<DrugResponse>()
+                    .body.items
+            response
+        } catch (e: JsonConvertException) {
+            e.printStackTrace()
+            emptyList()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+
     suspend fun getDrugDetailInfo(itemName: String): List<Item> =
         try {
             val response =
