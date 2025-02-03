@@ -62,21 +62,23 @@ android {
 
 dependencies {
 
-    implementation("com.kakao.maps.open:android:2.12.8")
+    implementation(libs.firebase.firestore)
 
-    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation(libs.android)
 
-    implementation("androidx.fragment:fragment-ktx:1.8.3")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
-    implementation("androidx.datastore:datastore:1.1.2")
+    implementation(libs.androidx.fragment.ktx.v183)
+
+    implementation(libs.androidx.datastore)
 
     implementation(libs.protobuf.kotlin)
     implementation(libs.androidx.datastore.core)
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.xml)
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
+    implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.android)
 

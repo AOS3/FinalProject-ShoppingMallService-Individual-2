@@ -1,13 +1,16 @@
 [versions]
 agp = "8.7.1"
+android = "2.12.8"
 annotation = "0.8.15"
 annotationVersion = "0.8.13"
+coilNetworkOkhttp = "3.0.4"
 connectClient = "1.1.0-alpha10"
 core = "0.8.13"
 datastoreCore = "1.1.2"
 firebaseBom = "33.7.0"
 firebaseUiAuth = "7.2.0"
 fragmentKtx = "1.8.5"
+fragmentKtxVersion = "1.8.3"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -42,19 +45,25 @@ protobuf_plugin = "0.9.4"
 protobuf_google_common = "2.39.1"
 
 [libraries]
+android = { module = "com.kakao.maps.open:android", version.ref = "android" }
 androidx-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastoreCore" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCore" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+androidx-fragment-ktx-v183 = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 annotation = { module = "com.tickaroo.tikxml:annotation", version.ref = "annotation" }
 annotation-v0813 = { module = "com.tickaroo.tikxml:annotation", version.ref = "annotationVersion" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilNetworkOkhttp" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 core = { module = "com.tickaroo.tikxml:core", version.ref = "annotation" }
 core-v0813 = { module = "com.tickaroo.tikxml:core", version.ref = "core" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

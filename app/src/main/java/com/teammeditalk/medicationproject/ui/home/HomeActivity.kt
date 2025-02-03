@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,23 +42,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.teammeditalk.medicationproject.data.model.Item
+import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.DrugRepository
-import com.teammeditalk.medicationproject.ui.detail.DrugDetailScreen
+import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
+import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
+import com.teammeditalk.medicationproject.ui.Application
+import com.teammeditalk.medicationproject.ui.cart.CartScreen
+import com.teammeditalk.medicationproject.ui.detail.DetailViewModel
+import com.teammeditalk.medicationproject.ui.detail.DetailViewModelFactory
+import com.teammeditalk.medicationproject.ui.detail.DrugDetailInfoScreen
 import com.teammeditalk.medicationproject.ui.mypage.MyPageActivity
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugScreen
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugViewModel
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugViewModelFactory
+import com.teammeditalk.medicationproject.ui.search.symptom.SearchDrugBySymptomScreen
+import com.teammeditalk.medicationproject.ui.search.symptom.SearchDrugBySymptomViewModel
+import com.teammeditalk.medicationproject.ui.search.symptom.SearchDrugBySymptomViewModelFactory
 import com.teammeditalk.medicationproject.ui.theme.MedicationProjectTheme
 import com.teammeditalk.medicationproject.ui.util.RoundedButton
 
 enum class HomeScreen {
     Home,
+    Symptom,
     Search,
     Detail,
     Cart,
@@ -65,6 +78,8 @@ enum class HomeScreen {
 }
 
 class HomeActivity : ComponentActivity() {
+    private val dataStore by lazy { (application as Application).userHealthdataStore }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,12 +91,32 @@ class HomeActivity : ComponentActivity() {
                 SearchDrugViewModelFactory(DrugRepository()),
             )[SearchDrugViewModel::class.java]
 
+        val searchDrugBySymptomViewModel =
+            ViewModelProvider(
+                this,
+                SearchDrugBySymptomViewModelFactory(DrugRepository()),
+            )[SearchDrugBySymptomViewModel::class.java]
+
+        val detailViewModel =
+            ViewModelProvider(
+                this,
+                DetailViewModelFactory(
+                    DiseaseRepository(),
+                    MyDiseaseRepository(dataStore = dataStore),
+                    MyAllergyRepository(dataStore = dataStore),
+                ),
+            )[DetailViewModel::class.java]
+
         setContent {
             var drugInfo by remember { mutableStateOf(emptyList<Item>()) }
 
             LaunchedEffect(Unit) {
                 viewModel.drugInfo.collect {
                     drugInfo = it
+                }
+            }
+            LaunchedEffect(Unit) {
+                searchDrugBySymptomViewModel.drugInfo.collect {
                 }
             }
             val navController = rememberNavController()
@@ -110,32 +145,44 @@ class HomeActivity : ComponentActivity() {
                         modifier =
                             Modifier
                                 .fillMaxSize()
+                                .fillMaxHeight()
                                 .padding(innerPadding),
                     ) {
                         composable(route = HomeScreen.Home.name) {
                             HomeScreen(
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding),
+                                modifier = Modifier.padding(10.dp),
                                 onSymptomItemClick = {
-                                    navController.navigate(HomeScreen.Search.name)
+                                    navController.navigate(HomeScreen.Home.name)
                                 },
                                 onPartItemClick = {},
+                            )
+                        }
+                        composable(route = HomeScreen.Symptom.name) {
+                            SearchDrugBySymptomScreen(
+                                navController = navController,
+                                modifier = Modifier,
+                                viewmodel = searchDrugBySymptomViewModel,
                             )
                         }
                         composable(route = HomeScreen.Search.name) {
                             SearchDrugScreen(
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding),
+                                modifier = Modifier,
                                 viewmodel = viewModel,
                             )
                         }
                         composable(route = HomeScreen.Detail.name) {
-                            DrugDetailScreen(
-                                modifier = Modifier.padding(innerPadding),
+                            DrugDetailInfoScreen(
+                                modifier = Modifier,
                                 drugInfo = if (drugInfo.isNotEmpty()) drugInfo[0] else Item(),
+                                viewModel = detailViewModel,
                             )
                         }
                         composable(route = HomeScreen.Cart.name) {
+                            CartScreen(
+                                navController = navController,
+                            )
                         }
 
                         composable(route = HomeScreen.Map.name) {
@@ -166,7 +213,7 @@ class HomeActivity : ComponentActivity() {
                     imageVector = Icons.Default.Search,
                     onClick = {
                         // todo : 증상 카테고리도 넘기기
-                        navController.navigate(HomeScreen.Search.name)
+                        navController.navigate(HomeScreen.Symptom.name)
                     },
                 )
 
@@ -197,13 +244,16 @@ class HomeActivity : ComponentActivity() {
             Spacer(modifier = Modifier.weight(1f))
 
             // 하단 네비게이션
-            BottomNav()
+            BottomNav(navController)
         }
     }
 
     @Suppress("ktlint:standard:function-naming")
     @Composable
-    private fun BottomNav(context: Context = LocalContext.current) {
+    private fun BottomNav(
+        navController: NavController,
+        context: Context = LocalContext.current,
+    ) {
         NavigationBar {
             NavigationBarItem(
                 icon = { Icon(imageVector = (Icons.Default.Home), "홈") },
@@ -215,7 +265,9 @@ class HomeActivity : ComponentActivity() {
                 icon = { Icon(imageVector = (Icons.Default.ShoppingCart), "Saved") },
                 label = { Text("장바구니") },
                 selected = false,
-                onClick = { /* 처리 */ },
+                onClick = {
+                    navController.navigate(HomeScreen.Cart.name)
+                },
             )
             NavigationBarItem(
                 icon = { Icon(imageVector = (Icons.Default.Person), "마이페이지") },

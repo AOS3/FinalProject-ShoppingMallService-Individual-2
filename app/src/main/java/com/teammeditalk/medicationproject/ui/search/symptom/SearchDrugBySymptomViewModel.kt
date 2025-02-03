@@ -1,4 +1,4 @@
-package com.teammeditalk.medicationproject.ui.search.drug
+package com.teammeditalk.medicationproject.ui.search.symptom
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,11 +9,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SearchDrugViewModel(
+class SearchDrugBySymptomViewModel(
     private val drugRepository: DrugRepository,
 ) : ViewModel() {
     private val _drugInfo = MutableStateFlow(emptyList<Item>())
     val drugInfo = _drugInfo.asStateFlow()
+
+    fun searchDrugBySymptom(symptom: String) {
+        viewModelScope.launch {
+            drugRepository.getDrugBySymptom(symptom)
+        }
+    }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
     private val _searchQuery =
         MutableStateFlow("").apply {
@@ -27,24 +37,6 @@ class SearchDrugViewModel(
             Log.d("결과", this.value.toString())
         }
     val searchResult = _searchResult.asStateFlow()
-
-    fun searchDrugDetail(itemName: String) {
-        viewModelScope.launch {
-            val response = drugRepository.getDrugInfo(itemName)
-            _drugInfo.value = response
-        }
-    }
-
-    fun searchDrugInfo(itemName: String) {
-        viewModelScope.launch {
-            val response = drugRepository.getDrugList(itemName = itemName)
-            _searchResult.value = response
-        }
-    }
-
-    fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-    }
 
     fun reset() {
         _searchQuery.value = ""

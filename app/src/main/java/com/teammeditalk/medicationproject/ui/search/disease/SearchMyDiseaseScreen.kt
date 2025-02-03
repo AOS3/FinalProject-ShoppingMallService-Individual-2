@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -53,7 +52,6 @@ fun SearchMyDiseaseScreen(
     Column(
         modifier =
             modifier
-                .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -61,8 +59,7 @@ fun SearchMyDiseaseScreen(
         // 1. 검색바
         Column {
             SearchBar(
-                modifier = Modifier.height(500.dp),
-                // 검색 영역이 남은 공간을 채우도록
+                modifier = modifier.height(300.dp),
                 trailingIcon =
                     {
                         Icon(
