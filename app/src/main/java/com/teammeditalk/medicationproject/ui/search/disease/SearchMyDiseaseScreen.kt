@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.teammeditalk.medicationproject.ui.mypage.MyPageScreen
 import com.teammeditalk.medicationproject.ui.mypage.MyPageViewModel
 import com.teammeditalk.medicationproject.ui.util.SearchResultItem
 
@@ -59,7 +60,19 @@ fun SearchMyDiseaseScreen(
         // 1. 검색바
         Column {
             SearchBar(
-                modifier = modifier.height(300.dp),
+                modifier = Modifier.weight(1f),
+                leadingIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(MyPageScreen.Start.name)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
                 trailingIcon =
                     {
                         Icon(

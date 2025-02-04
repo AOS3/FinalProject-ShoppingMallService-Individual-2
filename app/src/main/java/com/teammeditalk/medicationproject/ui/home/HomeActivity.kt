@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -63,6 +64,8 @@ import com.teammeditalk.medicationproject.ui.detail.DetailViewModel
 import com.teammeditalk.medicationproject.ui.detail.DetailViewModelFactory
 import com.teammeditalk.medicationproject.ui.detail.DrugDetailInfoScreen
 import com.teammeditalk.medicationproject.ui.mypage.MyPageActivity
+import com.teammeditalk.medicationproject.ui.order.OrderCompleteScreen
+import com.teammeditalk.medicationproject.ui.order.OrderHistoryScreen
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugScreen
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugViewModel
 import com.teammeditalk.medicationproject.ui.search.drug.SearchDrugViewModelFactory
@@ -79,6 +82,8 @@ enum class HomeScreen {
     Detail,
     Cart,
     Map,
+    Complete,
+    OrderDetail,
 }
 
 class HomeActivity : ComponentActivity() {
@@ -206,6 +211,14 @@ class HomeActivity : ComponentActivity() {
 
                         composable(route = HomeScreen.Map.name) {
                         }
+                        composable(route = HomeScreen.Complete.name) {
+                            OrderCompleteScreen(
+                                navController = navController,
+                            )
+                        }
+                        composable(route = HomeScreen.OrderDetail.name) {
+                            OrderHistoryScreen(viewModel = cartViewModel)
+                        }
                     }
                 }
             }
@@ -259,6 +272,13 @@ class HomeActivity : ComponentActivity() {
                     onClick = {},
                 )
             }
+            RoundedButton(
+                text = "내 처방 요청 \n히스토리",
+                imageVector = Icons.Default.List,
+                onClick = {
+                    navController.navigate(HomeScreen.OrderDetail.name)
+                },
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 

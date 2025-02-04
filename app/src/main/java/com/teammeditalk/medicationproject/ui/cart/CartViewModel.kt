@@ -24,6 +24,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+data class OrderResponse(
+    val orderDate: String,
+    val orderDrugList: String,
+    val message: String,
+)
+
 class CartViewModel(
     private val myDiseaseRepository: MyDiseaseRepository,
     private val myDrugRepository: MyDrugRepository,
@@ -32,6 +38,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val _selectedDrugList = MutableStateFlow(emptyList<DrugInCart>())
     val selectedDrugList = _selectedDrugList.asStateFlow()
+
+    private val _orderDrugList = MutableStateFlow(emptyList<OrderResponse>())
+    val orderDrugList = _orderDrugList.asStateFlow()
 
     fun setSelectedDrugList(selectedDrugList: List<DrugInCart>) {
         _selectedDrugList.value = selectedDrugList
@@ -92,6 +101,28 @@ class CartViewModel(
                 _myDrugList.value = it
             }
         }
+    }
+
+    fun getOrderList() {
+        val db = Firebase.firestore
+        if (uuid == null) return
+        db
+            .collection("order_${uuid!!}")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val orderList =
+                    snapshot.documents.map { document ->
+                        OrderResponse(
+                            orderDate = document.data?.get("orderDate").toString(),
+                            orderDrugList = document.data?.get("orderDrugList").toString(),
+                            message = document.data?.get("message").toString(),
+                        )
+                    }
+                _orderDrugList.value = orderList
+            }.addOnFailureListener {
+                it.printStackTrace()
+                _orderDrugList.value = emptyList()
+            }
     }
 
     private fun order(orderRequest: OrderRequest) {

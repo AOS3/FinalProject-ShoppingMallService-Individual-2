@@ -177,6 +177,7 @@ fun CartScreen(
             drugList = customOrderDialogState.drugList,
             onClickConfirm = { message ->
                 customOrderDialogState.onClickConfirm(message)
+                navController.navigate(HomeScreen.Complete.name)
             },
             onClickCancel = customOrderDialogState.onClickCancel,
         )

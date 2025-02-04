@@ -26,6 +26,7 @@ import coil3.compose.AsyncImage
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.teammeditalk.medicationproject.data.model.Item
+import com.teammeditalk.medicationproject.ui.home.HomeScreen
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -113,6 +114,7 @@ fun DrugDetailInfoScreen(
             onClick = {
                 // todo : 장바구니에 약 담기 이후 애니메이션 추가하기
                 viewModel.saveDrugIntoCart(db)
+                navController.navigate(HomeScreen.Cart.name)
             },
         ) {
             Text(
