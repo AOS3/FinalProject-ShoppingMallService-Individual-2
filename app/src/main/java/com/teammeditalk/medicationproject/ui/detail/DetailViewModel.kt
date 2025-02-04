@@ -3,9 +3,9 @@ package com.teammeditalk.medicationproject.ui.detail
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.teammeditalk.medicationproject.data.model.Item
+import com.teammeditalk.medicationproject.data.repository.AuthRepository
 import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
 import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
@@ -27,39 +27,57 @@ fun extractDiseaseKeyword(disease: String): String {
 }
 
 class DetailViewModel(
+    private val authRepository: AuthRepository,
     private val diseaseRepository: DiseaseRepository,
     private val myDiseaseRepository: MyDiseaseRepository,
     private val myAllergyRepository: MyAllergyRepository,
 ) : ViewModel() {
     private var drugInfo: Item? = null
 
-    fun setDrugInfo(drugInfo: Item) {
-        this.drugInfo = drugInfo
+    private var uuid: String? = null
+
+    init {
+        viewModelScope.launch {
+            authRepository.uuid.collect {
+                uuid = it
+            }
+        }
     }
 
     private val _myKeyWord = MutableStateFlow(emptyList<String>())
     val myKeyWord = _myKeyWord.asStateFlow()
 
+    fun setDrugInfo(drugInfo: Item) {
+        this.drugInfo = drugInfo
+    }
+
     // todo : 장바구니에 담기  (db)
-    fun saveDrugIntoCart() {
-        val db = Firebase.firestore
+    fun saveDrugIntoCart(db: FirebaseFirestore) {
         val drug =
             hashMapOf(
                 "name" to drugInfo?.itemName,
-                "count" to 1,
+                "user_id" to uuid,
                 "imageUri" to drugInfo?.itemImage,
             )
 
-        // Add a new document with a generated ID
-        db
-            .collection("cart")
-            .document()
-            .set(drug)
-            .addOnSuccessListener { documentReference ->
-                Log.d("장바구니", "DocumentSnapshot added with ID: $documentReference")
-            }.addOnFailureListener { e ->
-                Log.w("장바구니", "Error adding document", e)
-            }
+        try {
+            if (uuid == null) return
+            // Add a new document with a generated ID
+            db
+                .collection(uuid!!)
+                .add(drug)
+                .addOnSuccessListener { documentReference ->
+                    Log.d("장바구니", "DocumentSnapshot added with ID: $documentReference")
+                }.addOnFailureListener { e ->
+                    Log.w("장바구니", "Error adding document", e)
+                }
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+            Log.d("ClassNotFoundException", "failed to save drug item into cart :${e.message}")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("Exception", "failed to save drug item into cart :${e.message}")
+        }
     }
 
     // 내가 가진 정보 기반 키워드 찾기

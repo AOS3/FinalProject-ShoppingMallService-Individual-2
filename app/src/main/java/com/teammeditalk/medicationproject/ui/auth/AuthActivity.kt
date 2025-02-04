@@ -3,6 +3,7 @@ package com.teammeditalk.medicationproject.ui.auth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,22 +28,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.teammeditalk.medicationproject.R
+import com.teammeditalk.medicationproject.data.repository.AuthRepository
+import com.teammeditalk.medicationproject.ui.Application
 import com.teammeditalk.medicationproject.ui.home.HomeActivity
 import com.teammeditalk.medicationproject.ui.theme.MedicationProjectTheme
 
 class AuthActivity : ComponentActivity() {
-    private val signInLauncher =
-        registerForActivityResult(
-            FirebaseAuthUIActivityResultContract(),
-            { res ->
-                this.onSignInResult(res)
-            },
-        )
+    private val dataStore by lazy {
+        try {
+            val app =
+                applicationContext as? Application
+                    ?: throw IllegalStateException("Application 클래스가 초기화되지 않았어요")
+            app.userInfoDataStore
+        } catch (e: IllegalStateException) {
+            Log.e("AuthActivity", "DataStore 초기화 실패", e)
+            throw IllegalStateException("DataStore 초기화에 실패했습니다: ${e.message}")
+        }
+    }
 
     private val providers =
         arrayListOf(
@@ -56,7 +64,10 @@ class AuthActivity : ComponentActivity() {
             .setAvailableProviders(providers)
             .build()
 
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+    private fun onSignInResult(
+        result: FirebaseAuthUIAuthenticationResult,
+        viewModel: AuthViewModel,
+    ) {
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK) {
             val user = FirebaseAuth.getInstance().currentUser
@@ -64,6 +75,7 @@ class AuthActivity : ComponentActivity() {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             // todo : 로컬에 user정보 저장하기 이후 자동 로그인 구현
+            if (user?.uid != null) viewModel.saveUuid(user.uid)
         } else {
             // sign in failed
             Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show()
@@ -73,6 +85,19 @@ class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val viewModel =
+            ViewModelProvider(
+                this,
+                AuthViewModelFactory(AuthRepository(dataStore)),
+            )[AuthViewModel::class.java]
+
+        val signInLauncher =
+            registerForActivityResult(
+                FirebaseAuthUIActivityResultContract(),
+                { res ->
+                    this.onSignInResult(res, viewModel)
+                },
+            )
         setContent {
             MedicationProjectTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

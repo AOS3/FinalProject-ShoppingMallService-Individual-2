@@ -7,7 +7,7 @@ coilNetworkOkhttp = "3.0.4"
 connectClient = "1.1.0-alpha10"
 core = "0.8.13"
 datastoreCore = "1.1.2"
-firebaseBom = "33.7.0"
+firebaseBom = "32.7.0"
 firebaseUiAuth = "7.2.0"
 fragmentKtx = "1.8.5"
 fragmentKtxVersion = "1.8.3"
@@ -32,13 +32,13 @@ material = "1.7.6"
 navigationCompose = "2.8.5"
 appcompat = "1.7.0"
 processor = "0.8.13"
-protobufKotlin = "3.19.4"
+protobufKotlin = "3.21.12"
 retrofit = "2.11.0"
 kotlin_ksp = "2.0.0-1.0.23"
 
 # Protobuf, GRPC
 # [GitHub](https://github.com/protocolbuffers/protobuf)
-protobuf = "4.27.2"
+protobuf = "3.21.12"
 # [GitHub](https://github.com/google/protobuf-gradle-plugin)
 protobuf_plugin = "0.9.4"
 # [Github](https://github.com/googleapis/sdk-platform-java/tree/main/java-common-protos)
@@ -63,7 +63,7 @@ core = { module = "com.tickaroo.tikxml:core", version.ref = "annotation" }
 core-v0813 = { module = "com.tickaroo.tikxml:core", version.ref = "core" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -88,10 +88,8 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktorClientSerialization" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
 ktor-serialization-kotlinx-xml = { module = "io.ktor:ktor-serialization-kotlinx-xml", version.ref = "ktorSerializationKotlinxXml" }
-processor = { module = "com.tickaroo.tikxml:processor", version.ref = "annotation" }
 processor-v0813 = { module = "com.tickaroo.tikxml:processor", version.ref = "processor" }
 protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "protobufKotlin" }
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

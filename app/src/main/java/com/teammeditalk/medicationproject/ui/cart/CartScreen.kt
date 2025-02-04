@@ -3,13 +3,18 @@ package com.teammeditalk.medicationproject.ui.cart
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -19,25 +24,53 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
+import com.teammeditalk.medicationproject.ui.home.HomeScreen
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 data class Drug(
+    val id: String,
+    val userId: String,
     val drugName: String,
-    val drugCount: Int,
     val drugImageUri: String,
 )
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun CartScreen(navController: NavController) {
+fun CartScreen(
+    viewModel: CartViewModel,
+    navController: NavController,
+) {
+    val drugList by viewModel.drugList.collectAsState(initial = emptyList())
+    val isLoading by viewModel.isLoading.collectAsState(initial = true)
+    val isDeleted by viewModel.isDeleted.collectAsState(initial = false)
+
+    // 선택된 아이템을 관리하기 위함!
+    var selectedDrugs by remember { mutableStateOf(listOf<Drug>()) }
+
+    // 전체 토클 상태
+    var isAllSelected by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.getDrugItemInCart()
+    }
     Column(
         Modifier.background(Color.White),
     ) {
@@ -52,7 +85,7 @@ fun CartScreen(navController: NavController) {
             navigationIcon = {
                 IconButton(
                     onClick = {
-                        navController.popBackStack()
+                        navController.navigate(HomeScreen.Search.name)
                     },
                 ) {
                     Icon(
@@ -63,35 +96,67 @@ fun CartScreen(navController: NavController) {
             },
         )
         Row(
-            modifier = Modifier.padding(5.dp),
-            horizontalArrangement = Arrangement.Absolute.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(
-                checked = false,
-                onCheckedChange = {},
-            )
-            Text(
-                text = "전체 선택(2/3)",
-            )
-        }
-        // todo : 장바구니에 아이템 추가하기
-        Column(
             modifier =
                 Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            DrugItem(
-                Drug("이지엔", 1, "https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1Orz9gcUHnw"),
-            )
-            DrugItem(
-                Drug("타이레놀", 1, "https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1Orz9gcUHnw"),
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Checkbox(
+                    checked = isAllSelected,
+                    onCheckedChange = {
+                        isAllSelected = it
+                        selectedDrugs = if (it) drugList else emptyList()
+                    },
+                )
+                Text(
+                    // todo : 체크된 아이템의 수 적용
+                    text = "전체 선택(${selectedDrugs.size}/${drugList.size})",
+                )
+            }
 
-            DrugItem(
-                Drug("까스활명수", 1, "https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1Orz9gcUHnw"),
-            )
+            TextButton(
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.deleteDrugItemInCart(selectedDrugs)
+                    }
+                },
+            ) {
+                Text("선택 삭제")
+            }
+        }
+        // todo : 장바구니에 아이템 추가하기
+        if (isLoading) {
+            LoadingScreen()
+        } else {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+            ) {
+                LazyColumn {
+                    items(drugList) { drug ->
+                        DrugItem(
+                            drugItem = drug,
+                            isSelected = drug in selectedDrugs,
+                            onSelectionChange = { isSelected ->
+                                selectedDrugs =
+                                    if (isSelected) {
+                                        selectedDrugs + drug
+                                    } else {
+                                        selectedDrugs - drug
+                                    }
+                                isAllSelected = selectedDrugs.size == drugList.size
+                            },
+                        )
+                    }
+                }
+            }
         }
 
         Button(
@@ -108,7 +173,11 @@ fun CartScreen(navController: NavController) {
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun DrugItem(drugItem: Drug) {
+fun DrugItem(
+    isSelected: Boolean = false,
+    drugItem: Drug,
+    onSelectionChange: (Boolean) -> Unit,
+) {
     Surface(
         modifier =
             Modifier
@@ -120,29 +189,48 @@ fun DrugItem(drugItem: Drug) {
     ) {
         Row(
             modifier = Modifier.padding(10.dp),
-            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
-                checked = false,
-                onCheckedChange = { },
+                checked = isSelected,
+                onCheckedChange = onSelectionChange,
             )
-            AsyncImage(
-                modifier =
-                    Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                model = drugItem.drugImageUri,
-                contentDescription = null,
-            )
+//            AsyncImage(
+//                modifier =
+//                    Modifier
+//                        .size(50.dp)
+//                        .clip(RoundedCornerShape(10.dp)),
+//                model = drugItem.drugImageUri,
+//                contentDescription = null,
+//            )
 
-            Column {
-                Text(drugItem.drugName)
-                Text("수량 : ${drugItem.drugCount}")
-            }
-            Button(onClick = {}) {
-                Text(text = "삭제")
+            Column(
+                Modifier.padding(5.dp),
+            ) {
+                Text(
+                    maxLines = 2,
+                    text = drugItem.drugName,
+                )
+                Text("수량 : ${1}")
             }
         }
+    }
+}
+
+@Suppress("ktlint:standard:function-naming")
+// 로딩 화면 추가
+@Composable
+fun LoadingScreen() {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(50.dp),
+        )
     }
 }

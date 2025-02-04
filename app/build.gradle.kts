@@ -13,6 +13,16 @@ plugins {
     alias(libs.plugins.protobuf)
 }
 
+configurations.all {
+    resolutionStrategy {
+        // force와 exclude 구문을 수정
+        force("com.google.protobuf:protobuf-javalite:3.21.12")
+
+        // 충돌하는 의존성 제외
+        exclude(group = "com.google.protobuf", module = "protobuf-java")
+    }
+}
+
 android {
 // 추가
     val properties =
@@ -61,6 +71,8 @@ android {
 }
 
 dependencies {
+    // implementation("com.google.type:type:0.12.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.21.12")
 
     implementation(libs.firebase.firestore)
 
@@ -75,6 +87,7 @@ dependencies {
 
     implementation(libs.protobuf.kotlin)
     implementation(libs.androidx.datastore.core)
+
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.xml)
@@ -135,8 +148,8 @@ protobuf {
     generateProtoTasks {
         all().forEach {
             it.plugins {
-                register("java") { option("lite") }
                 register("kotlin") { option("lite") }
+                register("java") { option("lite") }
             }
         }
     }

@@ -3,6 +3,10 @@ syntax = "proto3";
 option java_package = "com.teammeditalk.medicationproject";
 option java_multiple_files = true;
 
+
+message UserInfo {
+  string uuid = 1; // 유저의 id
+}
 // 약국 위치 정보를 위한 별도 메시지 타입
 message PharmacyLocation {
   string address = 1;     // 주소
@@ -10,7 +14,6 @@ message PharmacyLocation {
 }
 
 message UserHealthInfo {
-
   repeated string diseaseInfo = 1;
   repeated string drugInfo = 2;
   repeated string allergyInfo = 3;

@@ -5,6 +5,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,18 +18,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import com.teammeditalk.medicationproject.data.model.Item
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun DrugDetailInfoScreen(
+    navController: NavController,
     modifier: Modifier,
     drugInfo: Item,
     viewModel: DetailViewModel,
 ) {
+    val db = Firebase.firestore
     val myKeyWord by viewModel.myKeyWord.collectAsState()
     viewModel.setDrugInfo(drugInfo)
     viewModel.findMyIllness()
@@ -35,13 +46,31 @@ fun DrugDetailInfoScreen(
                 .verticalScroll(scrollState)
                 .padding(5.dp),
     ) {
-        Text(
-            modifier = modifier.padding(bottom = 10.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
-            text = drugInfo.itemName.toString(),
+        TopAppBar(
+            backgroundColor = Color.White,
+            navigationIcon =
+                {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "뒤로 가기",
+                        )
+                    }
+                },
+            title = {
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleMedium,
+                    text = drugInfo.itemName.toString(),
+                )
+            },
         )
         AsyncImage(
+            modifier =
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(10.dp),
             model = drugInfo.itemImage.toString(),
             contentDescription = null,
         )
@@ -79,17 +108,11 @@ fun DrugDetailInfoScreen(
             info = drugInfo.intrcQesitm.toString(),
         )
 
-//        DrugInfoItem(
-//            modifier = modifier,
-//            title = "이상 반응 : ",
-//            info = drugInfo.seQesitm.toString(),
-//        )
-
         Button(
             modifier = modifier.align(Alignment.CenterHorizontally),
             onClick = {
-                // todo : 장바구니에 약 담기
-                viewModel.saveDrugIntoCart()
+                // todo : 장바구니에 약 담기 이후 애니메이션 추가하기
+                viewModel.saveDrugIntoCart(db)
             },
         ) {
             Text(

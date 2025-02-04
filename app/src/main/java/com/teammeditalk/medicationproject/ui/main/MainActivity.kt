@@ -1,6 +1,7 @@
 package com.teammeditalk.medicationproject.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,12 +12,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.teammeditalk.medicationproject.ui.Application
 import com.teammeditalk.medicationproject.ui.theme.MedicationProjectTheme
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             MedicationProjectTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

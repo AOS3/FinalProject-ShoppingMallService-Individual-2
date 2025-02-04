@@ -38,7 +38,12 @@ class SearchDrugViewModel(
     fun searchDrugInfo(itemName: String) {
         viewModelScope.launch {
             val response = drugRepository.getDrugList(itemName = itemName)
-            _searchResult.value = response
+            if (response.isEmpty()) {
+                // todo : 결과 처리
+                _searchResult.value = listOf("검색 결과가 없습니다.")
+            } else {
+                _searchResult.value = response
+            }
         }
     }
 

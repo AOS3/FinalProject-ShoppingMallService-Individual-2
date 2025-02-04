@@ -49,12 +49,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.teammeditalk.medicationproject.data.model.Item
+import com.teammeditalk.medicationproject.data.repository.AuthRepository
 import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.DrugRepository
 import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
 import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
 import com.teammeditalk.medicationproject.ui.Application
 import com.teammeditalk.medicationproject.ui.cart.CartScreen
+import com.teammeditalk.medicationproject.ui.cart.CartViewModel
+import com.teammeditalk.medicationproject.ui.cart.CartViewModelFactory
 import com.teammeditalk.medicationproject.ui.detail.DetailViewModel
 import com.teammeditalk.medicationproject.ui.detail.DetailViewModelFactory
 import com.teammeditalk.medicationproject.ui.detail.DrugDetailInfoScreen
@@ -79,11 +82,18 @@ enum class HomeScreen {
 
 class HomeActivity : ComponentActivity() {
     private val dataStore by lazy { (application as Application).userHealthdataStore }
+    private val userInfoDataStore by lazy { (application as Application).userInfoDataStore }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val cartViewModel =
+            ViewModelProvider(
+                this,
+                CartViewModelFactory(AuthRepository(userInfoDataStore)),
+            )[CartViewModel::class.java]
 
         val viewModel =
             ViewModelProvider(
@@ -101,6 +111,7 @@ class HomeActivity : ComponentActivity() {
             ViewModelProvider(
                 this,
                 DetailViewModelFactory(
+                    AuthRepository(userInfoDataStore),
                     DiseaseRepository(),
                     MyDiseaseRepository(dataStore = dataStore),
                     MyAllergyRepository(dataStore = dataStore),
@@ -177,11 +188,13 @@ class HomeActivity : ComponentActivity() {
                                 modifier = Modifier,
                                 drugInfo = if (drugInfo.isNotEmpty()) drugInfo[0] else Item(),
                                 viewModel = detailViewModel,
+                                navController = navController,
                             )
                         }
                         composable(route = HomeScreen.Cart.name) {
                             CartScreen(
                                 navController = navController,
+                                viewModel = cartViewModel,
                             )
                         }
 
