@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.teammeditalk.medicationproject.data.model.drug.DrugInCart
+import com.teammeditalk.medicationproject.data.model.order.OrderRequest
 import com.teammeditalk.medicationproject.data.repository.AuthRepository
 import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
 import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
@@ -16,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -26,8 +30,19 @@ class CartViewModel(
     private val myAllergyRepository: MyAllergyRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
-    private var uuid: String? = null
+    private val _selectedDrugList = MutableStateFlow(emptyList<DrugInCart>())
+    val selectedDrugList = _selectedDrugList.asStateFlow()
 
+    fun setSelectedDrugList(selectedDrugList: List<DrugInCart>) {
+        _selectedDrugList.value = selectedDrugList
+    }
+
+    val customOrderDialogState: MutableState<CustomOrderDialogState> =
+        mutableStateOf<CustomOrderDialogState>(
+            CustomOrderDialogState(),
+        )
+
+    private var uuid: String? = null
     private val _myDrugList =
         MutableStateFlow(
             emptyList<String>(),
@@ -50,7 +65,7 @@ class CartViewModel(
     private val _isDeleted = MutableStateFlow(false)
     val isDeleted = _isDeleted.asStateFlow()
 
-    private val _drugList = MutableStateFlow<List<Drug>>(emptyList())
+    private val _drugList = MutableStateFlow<List<DrugInCart>>(emptyList())
     val drugList = _drugList.asStateFlow()
 
     private val _isLoading = MutableStateFlow(true)
@@ -79,27 +94,66 @@ class CartViewModel(
         }
     }
 
-    val customOrderDialogState: MutableState<CustomOrderDialogState> =
-        mutableStateOf<CustomOrderDialogState>(
-            CustomOrderDialogState(),
-        )
+    private fun order(orderRequest: OrderRequest) {
+        val order =
+            hashMapOf(
+                "orderDate" to orderRequest.timeStamp,
+                "allergyList" to orderRequest.allergyList,
+                "diseaseList" to orderRequest.diseaseList,
+                "drugList" to orderRequest.drugList,
+                "orderDrugList" to orderRequest.orderDrugList,
+                "message" to orderRequest.message,
+            )
+
+        viewModelScope.launch {
+            val db = Firebase.firestore
+            db
+                .collection("order_$uuid")
+                .add(order)
+                .addOnSuccessListener {
+                    Log.d("주문", "DocumentSnapshot added with ID: $it")
+                    resetDialogState()
+                }.addOnFailureListener { e ->
+                    Log.w("주문", "Error adding document", e)
+                }
+        }
+    }
+
+    fun getCurrentTimeStamp(): String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
     fun showCustomOrderDialog() {
-        customOrderDialogState.value =
-            CustomOrderDialogState(
-                allergyList = _myAllergyList.value,
-                diseaseList = _myDiseaseList.value,
-                drugList = _myDrugList.value,
-                onClickConfirm = {},
-                onClickCancel = {},
-            )
+        if (uuid != null) {
+            customOrderDialogState.value =
+                CustomOrderDialogState(
+                    allergyList = _myAllergyList.value,
+                    diseaseList = _myDiseaseList.value,
+                    drugList = _myDrugList.value,
+                    orderDrugList = _selectedDrugList.value,
+                    onClickConfirm = { message ->
+                        order(
+                            OrderRequest(
+                                timeStamp = getCurrentTimeStamp(),
+                                userId = uuid!!,
+                                allergyList = _myAllergyList.value,
+                                diseaseList = _myDiseaseList.value,
+                                drugList = _myDrugList.value,
+                                message = message,
+                                orderDrugList = _selectedDrugList.value,
+                            ),
+                        )
+                    },
+                    onClickCancel = {
+                        resetDialogState()
+                    },
+                )
+        }
     }
 
     fun resetDialogState() {
         customOrderDialogState.value = CustomOrderDialogState()
     }
 
-    fun deleteDrugItemInCart(drug: List<Drug>) {
+    fun deleteDrugItemInCart(drug: List<DrugInCart>) {
         viewModelScope.launch {
             val db = Firebase.firestore
             drug.forEach {
@@ -130,7 +184,7 @@ class CartViewModel(
                         // todo :mapNotNull vs map
                         snapshot.documents.map { document ->
                             val data = document.data
-                            Drug(
+                            DrugInCart(
                                 id = document.id,
                                 drugImageUri = data?.get("imageUri").toString(),
                                 drugName = data?.get("name").toString(),

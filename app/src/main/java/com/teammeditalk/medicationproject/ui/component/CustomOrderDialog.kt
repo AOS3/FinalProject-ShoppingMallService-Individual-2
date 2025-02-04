@@ -27,13 +27,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.teammeditalk.medicationproject.data.model.drug.DrugInCart
 
 // CustomAlertDialogState.kt
 data class CustomOrderDialogState(
     val allergyList: List<String> = emptyList(),
     val diseaseList: List<String> = emptyList(),
     val drugList: List<String> = emptyList(),
-    val onClickConfirm: () -> Unit = {},
+    val orderDrugList: List<DrugInCart> = emptyList(),
+    val onClickConfirm: (String) -> Unit = {},
     val onClickCancel: () -> Unit = {},
 )
 
@@ -44,6 +46,8 @@ fun CustomOrderDialog(
     allergyList: List<String>,
     diseaseList: List<String>,
     drugList: List<String>,
+    onClickConfirm: (String) -> Unit,
+    onClickCancel: () -> Unit,
 ) {
     var textValue by remember { mutableStateOf("") }
 
@@ -144,13 +148,13 @@ fun CustomOrderDialog(
                 ) {
                     TextButton(
                         modifier = Modifier.weight(1f),
-                        onClick = {},
+                        onClick = onClickCancel,
                     ) {
                         Text("주문 취소하기")
                     }
                     Button(
                         modifier = Modifier.weight(1f),
-                        onClick = {},
+                        onClick = { onClickConfirm(textValue) },
                     ) {
                         Text(text = "바로 주문하기")
                     }

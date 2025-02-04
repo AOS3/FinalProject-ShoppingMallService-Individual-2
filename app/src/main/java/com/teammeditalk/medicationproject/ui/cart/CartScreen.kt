@@ -40,17 +40,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.teammeditalk.medicationproject.data.model.drug.DrugInCart
 import com.teammeditalk.medicationproject.ui.component.CustomOrderDialog
 import com.teammeditalk.medicationproject.ui.home.HomeScreen
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-
-data class Drug(
-    val id: String,
-    val userId: String,
-    val drugName: String,
-    val drugImageUri: String,
-)
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -63,7 +57,7 @@ fun CartScreen(
     val isLoading by viewModel.isLoading.collectAsState(initial = true)
 
     // 선택된 아이템을 관리하기 위함!
-    var selectedDrugs by remember { mutableStateOf(listOf<Drug>()) }
+    var selectedDrugs by remember { mutableStateOf(listOf<DrugInCart>()) }
 
     // 전체 토클 상태
     var isAllSelected by remember { mutableStateOf(false) }
@@ -86,7 +80,7 @@ fun CartScreen(
             navigationIcon = {
                 IconButton(
                     onClick = {
-                        navController.navigate(HomeScreen.Search.name)
+                        navController.navigate(HomeScreen.Home.name)
                     },
                 ) {
                     Icon(
@@ -167,6 +161,10 @@ fun CartScreen(
                     .align(Alignment.CenterHorizontally),
             onClick = {
                 viewModel.showCustomOrderDialog()
+                viewModel.setSelectedDrugList(selectedDrugs)
+
+                // 주문한 약은 장바구니에서 없애기
+                viewModel.deleteDrugItemInCart(selectedDrugs)
             },
         ) {
             Text(text = "제휴 약국에 주문 요청하기")
@@ -177,6 +175,10 @@ fun CartScreen(
             allergyList = customOrderDialogState.allergyList,
             diseaseList = customOrderDialogState.diseaseList,
             drugList = customOrderDialogState.drugList,
+            onClickConfirm = { message ->
+                customOrderDialogState.onClickConfirm(message)
+            },
+            onClickCancel = customOrderDialogState.onClickCancel,
         )
     }
 }
@@ -185,7 +187,7 @@ fun CartScreen(
 @Composable
 fun DrugItem(
     isSelected: Boolean = false,
-    drugItem: Drug,
+    drugItem: DrugInCart,
     onSelectionChange: (Boolean) -> Unit,
 ) {
     Surface(
