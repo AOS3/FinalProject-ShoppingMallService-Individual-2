@@ -1,11 +1,17 @@
 package com.teammeditalk.medicationproject.ui.cart
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.teammeditalk.medicationproject.data.repository.AuthRepository
+import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
+import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
+import com.teammeditalk.medicationproject.data.repository.MyDrugRepository
+import com.teammeditalk.medicationproject.ui.component.CustomOrderDialogState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -15,9 +21,30 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class CartViewModel(
+    private val myDiseaseRepository: MyDiseaseRepository,
+    private val myDrugRepository: MyDrugRepository,
+    private val myAllergyRepository: MyAllergyRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
     private var uuid: String? = null
+
+    private val _myDrugList =
+        MutableStateFlow(
+            emptyList<String>(),
+        )
+    val myDrugList = _myDrugList.asStateFlow()
+
+    private val _myDiseaseList =
+        MutableStateFlow(
+            emptyList<String>(),
+        )
+    val myDiseaseList = _myDiseaseList.asStateFlow()
+
+    private val _myAllergyList =
+        MutableStateFlow(
+            emptyList<String>(),
+        )
+    val myAllergyList = _myAllergyList.asStateFlow()
 
     // 삭제 여부
     private val _isDeleted = MutableStateFlow(false)
@@ -35,9 +62,44 @@ class CartViewModel(
                 uuid = it
             }
         }
+        viewModelScope.launch {
+            myAllergyRepository.allergyFlow.collect {
+                _myAllergyList.value = it
+            }
+        }
+        viewModelScope.launch {
+            myDiseaseRepository.diseaseFlow.collect {
+                _myDiseaseList.value = it
+            }
+        }
+        viewModelScope.launch {
+            myDrugRepository.drugFlow.collect {
+                _myDrugList.value = it
+            }
+        }
     }
 
-    suspend fun deleteDrugItemInCart(drug: List<Drug>) {
+    val customOrderDialogState: MutableState<CustomOrderDialogState> =
+        mutableStateOf<CustomOrderDialogState>(
+            CustomOrderDialogState(),
+        )
+
+    fun showCustomOrderDialog() {
+        customOrderDialogState.value =
+            CustomOrderDialogState(
+                allergyList = _myAllergyList.value,
+                diseaseList = _myDiseaseList.value,
+                drugList = _myDrugList.value,
+                onClickConfirm = {},
+                onClickCancel = {},
+            )
+    }
+
+    fun resetDialogState() {
+        customOrderDialogState.value = CustomOrderDialogState()
+    }
+
+    fun deleteDrugItemInCart(drug: List<Drug>) {
         viewModelScope.launch {
             val db = Firebase.firestore
             drug.forEach {

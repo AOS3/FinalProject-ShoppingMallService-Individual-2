@@ -54,6 +54,7 @@ import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.DrugRepository
 import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
 import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
+import com.teammeditalk.medicationproject.data.repository.MyDrugRepository
 import com.teammeditalk.medicationproject.ui.Application
 import com.teammeditalk.medicationproject.ui.cart.CartScreen
 import com.teammeditalk.medicationproject.ui.cart.CartViewModel
@@ -92,7 +93,12 @@ class HomeActivity : ComponentActivity() {
         val cartViewModel =
             ViewModelProvider(
                 this,
-                CartViewModelFactory(AuthRepository(userInfoDataStore)),
+                CartViewModelFactory(
+                    myAllergyRepository = MyAllergyRepository(dataStore = dataStore),
+                    myDiseaseRepository = MyDiseaseRepository(dataStore = dataStore),
+                    myDrugRepository = MyDrugRepository(dataStore = dataStore),
+                    authRepository = AuthRepository(userInfoDataStore),
+                ),
             )[CartViewModel::class.java]
 
         val viewModel =

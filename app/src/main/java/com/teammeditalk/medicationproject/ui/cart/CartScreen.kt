@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.teammeditalk.medicationproject.ui.component.CustomOrderDialog
 import com.teammeditalk.medicationproject.ui.home.HomeScreen
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -57,9 +58,9 @@ fun CartScreen(
     viewModel: CartViewModel,
     navController: NavController,
 ) {
+    val customOrderDialogState = viewModel.customOrderDialogState.value
     val drugList by viewModel.drugList.collectAsState(initial = emptyList())
     val isLoading by viewModel.isLoading.collectAsState(initial = true)
-    val isDeleted by viewModel.isDeleted.collectAsState(initial = false)
 
     // 선택된 아이템을 관리하기 위함!
     var selectedDrugs by remember { mutableStateOf(listOf<Drug>()) }
@@ -164,10 +165,19 @@ fun CartScreen(
                 Modifier
                     .padding(8.dp)
                     .align(Alignment.CenterHorizontally),
-            onClick = {},
+            onClick = {
+                viewModel.showCustomOrderDialog()
+            },
         ) {
             Text(text = "제휴 약국에 주문 요청하기")
         }
+    }
+    if (customOrderDialogState.allergyList.isNotEmpty()) {
+        CustomOrderDialog(
+            allergyList = customOrderDialogState.allergyList,
+            diseaseList = customOrderDialogState.diseaseList,
+            drugList = customOrderDialogState.drugList,
+        )
     }
 }
 

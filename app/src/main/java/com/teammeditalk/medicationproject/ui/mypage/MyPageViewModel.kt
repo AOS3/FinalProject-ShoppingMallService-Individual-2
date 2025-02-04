@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
 import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
+import com.teammeditalk.medicationproject.data.repository.MyDrugRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -29,6 +30,7 @@ class MyPageViewModel(
     private val myAllergyRepository: MyAllergyRepository,
     private val diseaseRepository: DiseaseRepository,
     private val myDiseaseRepository: MyDiseaseRepository,
+    private val myDrugRepository: MyDrugRepository,
 ) : ViewModel() {
     val diseaseFLow = myDiseaseRepository.diseaseFlow
     val allergyFlow = myAllergyRepository.allergyFlow

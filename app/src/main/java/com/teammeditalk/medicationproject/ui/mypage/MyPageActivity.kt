@@ -38,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.teammeditalk.medicationproject.data.repository.DiseaseRepository
 import com.teammeditalk.medicationproject.data.repository.MyAllergyRepository
 import com.teammeditalk.medicationproject.data.repository.MyDiseaseRepository
+import com.teammeditalk.medicationproject.data.repository.MyDrugRepository
 import com.teammeditalk.medicationproject.ui.Application
 import com.teammeditalk.medicationproject.ui.allergy.AllergyScreen
 import com.teammeditalk.medicationproject.ui.component.TopAppBar
@@ -112,6 +113,7 @@ class MyPageActivity : ComponentActivity() {
                     DiseaseRepository(),
                     MyDiseaseRepository(dataStore = dataStore),
                     MyAllergyRepository(dataStore = dataStore),
+                    MyDrugRepository(dataStore = dataStore),
                 ),
             )[MyPageViewModel::class.java]
 
